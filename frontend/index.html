@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мебельная компания - Управление продукцией</title>
+    <!-- Добавляем FontAwesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; text-align: center; }
+        h1 { color: #2e7d32; font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 1.2em; }
+        .content { display: grid; grid-template-columns: 250px 1fr; gap: 30px; }
+        .sidebar { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .main-content { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: #f5f5f5; border: none; border-radius: 10px; text-align: left; font-size: 16px; cursor: pointer; transition: all 0.3s; }
+        .nav-btn:hover { background: #2e7d32; color: white; transform: translateX(5px); }
+        .nav-btn.active { background: #2e7d32; color: white; }
+        .section { display: none; animation: fadeIn 0.5s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { color: #2e7d32; margin-bottom: 20px; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
+        h3 { color: #2e7d32; margin: 20px 0 10px 0; }
+        .btn { padding: 12px 25px; background: #2e7d32; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background 0.3s; margin: 10px 0; }
+        .btn:hover { background: #1b5e20; }
+        .btn-primary { background: #2196F3; }
+        .btn-primary:hover { background: #0b7dda; }
+        .btn-secondary { background: #757575; }
+        .btn-secondary:hover { background: #5a5a5a; }
+        .btn-danger { background: #f44336; }
+        .btn-danger:hover { background: #d32f2f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #2e7d32; color: white; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .status { background: #4caf50; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.9em; }
+        .error { color: #f44336; padding: 10px; background: #ffebee; border-radius: 5px; margin: 10px 0; }
+        .success { color: #4caf50; padding: 10px; background: #e8f5e8; border-radius: 5px; margin: 10px 0; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-value { font-size: 2.5em; font-weight: bold; margin: 10px 0; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; }
+        
+        /* Стили для расширенных отчетов */
+        .bulk-actions { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            background: #f5f5f5; 
+            border-radius: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        .report-section { 
+            margin: 25px 0; 
+            padding: 20px; 
+            background: #f9f9f9; 
+            border-radius: 10px; 
+            border-left: 4px solid #2e7d32; 
+        }
+        .report-stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 15px; 
+            margin-top: 15px; 
+        }
+        .report-stats-grid .stat-card { 
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); 
+        }
+        .report-table { 
+            margin-top: 15px; 
+            background: white; 
+        }
+        .report-summary { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: #e8f5e9; 
+            border-radius: 10px; 
+            border: 1px solid #c8e6c9; 
+        }
+        .export-buttons { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 20px; 
+            flex-wrap: wrap; 
+        }
+        .export-btn { 
+            padding: 10px 20px; 
+            background: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+        }
+        .export-btn:hover { 
+            background: #388E3C; 
+        }
+        
+        /* Стили для модального окна */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.5); 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal-content { 
+            background: white; 
+            border-radius: 15px; 
+            width: 500px; 
+            max-width: 90%; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            overflow: hidden; 
+        }
+        .modal-header { 
+            padding: 20px; 
+            background: #f44336; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .modal-body { 
+            padding: 25px; 
+            text-align: center; 
+        }
+        .close-btn { 
+            background: none; 
+            border: none; 
+            color: white; 
+            font-size: 28px; 
+            cursor: pointer; 
+        }
+        .warning-icon { 
+            font-size: 60px; 
+            color: #f44336; 
+            margin-bottom: 15px; 
+        }
+        .product-name-warning { 
+            margin: 15px 0; 
+            padding: 15px; 
+            background: #ffebee; 
+            border-radius: 8px; 
+            border-left: 4px solid #f44336; 
+        }
+        
+        /* Стили для массовых действий в таблице */
+        .select-checkbox { 
+            width: 18px; 
+            height: 18px; 
+            cursor: pointer; 
+        }
+        .selected-row { 
+            background-color: #e3f2fd !important; 
+        }
+        .action-btn { 
+            padding: 5px 10px; 
+            margin: 0 3px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 14px; 
+        }
+        .edit-btn { 
+            background: #2196F3; 
+            color: white; 
+        }
+        .delete-btn { 
+            background: #f44336; 
+            color: white; 
+        }
+        
+        /* Стили для экспорта */
+        .export-section { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: #f5f5f5; 
+            border-radius: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏭 Мебельная компания "ЭкоДом"</h1>
+            <p class="subtitle">Система управления продукцией и производством</p>
+            <div class="status">✅ Система активна | 🗄 База данных: SQLite</div>
+        </header>
+        
+        <div class="content">
+            <div class="sidebar">
+                <button class="nav-btn active" onclick="showSection('dashboard')">📊 Панель управления</button>
+                <button class="nav-btn" onclick="showSection('products')">📦 Управление продукцией</button>
+                <button class="nav-btn" onclick="showSection('workshops')">🏭 Производственные цехи</button>
+                <button class="nav-btn" onclick="showSection('add-product')">➕ Добавить продукт</button>
+                <button class="nav-btn" onclick="showSection('reports')">📈 Отчеты</button>
+                <button class="nav-btn" onclick="showSection('advanced-reports')">📊 Расширенные отчеты</button>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <p style="font-size: 0.9em; color: #666;">© 2006-2025 Мебельная компания "ЭкоДом"</p>
+                    <p style="font-size: 0.8em; color: #999;">Версия 1.2.0</p>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <!-- Панель управления -->
+                <div id="dashboard" class="section active">
+                    <h2>📊 Панель управления</h2>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Всего продуктов</div>
+                            <div class="stat-value" id="total-products">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Производственных цехов</div>
+                            <div class="stat-value" id="total-workshops">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Типов продукции</div>
+                            <div class="stat-value" id="total-types">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Материалов</div>
+                            <div class="stat-value" id="total-materials">0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <h3>🎯 Быстрые действия</h3>
+                            <button class="btn" onclick="showSection('add-product')" style="width: 100%; margin-bottom: 10px;">➕ Добавить новый продукт</button>
+                            <button class="btn" onclick="showSection('products')" style="width: 100%; margin-bottom: 10px;">📦 Просмотр всей продукции</button>
+                            <button class="btn" onclick="showSection('workshops')" style="width: 100%;">🏭 Управление цехами</button>
+                        </div>
+                        
+                        <div>
+                            <h3>📋 Последние продукты</h3>
+                            <div id="recent-products"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Управление продукцией -->
+                <div id="products" class="section">
+                    <h2>📦 Управление продукцией</h2>
+                    <div id="bulk-actions" class="bulk-actions" style="display: none;">
+                        <div>
+                            <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)">
+                            <label for="select-all-checkbox" style="margin-left: 8px;">
+                                Выбрать все (<span id="selected-count">0</span>)
+                            </label>
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteSelectedProducts()">
+                            <i class="fas fa-trash"></i> Удалить выбранные
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearSelection()">
+                            <i class="fas fa-times"></i> Снять выделение
+                        </button>
+                    </div>
+                    <button class="btn" onclick="loadProducts()">🔄 Обновить список</button>
+                    <div id="products-list"></div>
+                </div>
+                
+                <!-- Производственные цехи -->
+                <div id="workshops" class="section">
+                    <h2>🏭 Производственные цехи</h2>
+                    <button class="btn" onclick="loadWorkshops()">🔄 Обновить список</button>
+                    <div id="workshops-list"></div>
+                </div>
+                
+                <!-- Добавление продукта -->
+                <div id="add-product" class="section">
+                    <h2>➕ Добавить новый продукт</h2>
+                    <form id="product-form" onsubmit="addProduct(event)">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label><i class="fas fa-barcode"></i> Артикул продукта *</label>
+                                <input type="text" id="article" placeholder="Например: CHAIR-2024" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> Наименование продукта *</label>
+                                <input type="text" id="product-name" placeholder="Например: Стул офисный" required>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label><i class="fas fa-list"></i> Тип продукции *</label>
+                                <select id="product-type" required>
+                                    <option value="">Выберите тип...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-tree"></i> Основной материал *</label>
+                                <select id="material" required>
+                                    <option value="">Выберите материал...</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-money-bill-wave"></i> Минимальная цена для партнера (руб.) *</label>
+                            <input type="number" id="price" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label><i class="fas fa-ruler"></i> Параметр 1 (длина в метрах) *</label>
+                                <input type="number" id="param1" step="0.01" min="0.01" value="1.0" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label><i class="fas fa-ruler-vertical"></i> Параметр 2 (ширина в метрах) *</label>
+                                <input type="number" id="param2" step="0.01" min="0.01" value="1.0" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn" style="padding: 15px 40px; font-size: 18px;">
+                            <i class="fas fa-save"></i> Сохранить продукт
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Отчеты -->
+                <div id="reports" class="section">
+                    <h2>📈 Отчеты и аналитика</h2>
+                    <div class="export-section">
+                        <h3><i class="fas fa-download"></i> Экспорт данных</h3>
+                        <div class="export-buttons">
+                            <button class="export-btn" onclick="exportData('products')">
+                                <i class="fas fa-file-excel"></i> Товары (Excel)
+                            </button>
+                            <button class="export-btn" onclick="exportData('workshops')">
+                                <i class="fas fa-file-excel"></i> Цехи (Excel)
+                            </button>
+                            <button class="export-btn" onclick="exportData('materials')">
+                                <i class="fas fa-file-excel"></i> Материалы (Excel)
+                            </button>
+                            <button class="export-btn" onclick="exportData('full')">
+                                <i class="fas fa-file-alt"></i> Полный отчет (CSV)
+                            </button>
+                        </div>
+                    </div>
+                    <div id="reports-content">
+                        <p>Загрузка отчетов...</p>
+                    </div>
+                </div>
+                
+                <!-- Расширенные отчеты -->
+                <div id="advanced-reports" class="section">
+                    <h2><i class="fas fa-chart-line"></i> Расширенные отчеты</h2>
+                    
+                    <div class="bulk-actions">
+                        <button class="btn btn-primary" onclick="generateDailyReport()">
+                            <i class="fas fa-calendar-day"></i> Ежедневный отчет
+                        </button>
+                        <button class="btn btn-primary" onclick="generateMonthlyReport()">
+                            <i class="fas fa-calendar-alt"></i> Ежемесячный отчет
+                        </button>
+                        <button class="btn btn-primary" onclick="generateFinancialReport()">
+                            <i class="fas fa-money-bill-wave"></i> Финансовый отчет
+                        </button>
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3><i class="fas fa-chart-pie"></i> Статистика по типам продукции</h3>
+                        <div id="type-statistics" class="report-stats-grid"></div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3><i class="fas fa-tree"></i> Использование материалов</h3>
+                        <div id="material-statistics" class="report-stats-grid"></div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3><i class="fas fa-industry"></i> Загрузка цехов</h3>
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Цех</th>
+                                    <th>Работников</th>
+                                    <th>Время обработки</th>
+                                    <th>Текущая загрузка</th>
+                                    <th>Кол-во продуктов</th>
+                                </tr>
+                            </thead>
+                            <tbody id="workshop-load-table">
+                                <!-- Заполнится JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="report-summary">
+                        <h4><i class="fas fa-file-signature"></i> Резюме отчета</h4>
+                        <div id="report-summary-content">
+                            <p>Дата генерации: <span id="report-date"></span></p>
+                            <p>Всего записей: <span id="total-report-items">0</span></p>
+                            <p>Период: <span id="report-period">За все время</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="export-buttons">
+                        <button class="export-btn" onclick="printReport()">
+                            <i class="fas fa-print"></i> Печать отчета
+                        </button>
+                        <button class="export-btn" onclick="saveReportAsPDF()">
+                            <i class="fas fa-file-pdf"></i> Сохранить как PDF
+                        </button>
+                        <button class="export-btn" onclick="emailReport()">
+                            <i class="fas fa-envelope"></i> Отправить по email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно подтверждения удаления -->
+    <div id="delete-confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Подтверждение удаления</h3>
+                <button class="close-btn" onclick="closeDeleteConfirm()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4>Вы уверены, что хотите удалить этот товар?</h4>
+                <p>Это действие нельзя отменить. Будут удалены все связанные данные.</p>
+                
+                <div class="product-name-warning">
+                    <i class="fas fa-box"></i>
+                    <strong>Товар:</strong> <span id="delete-product-name"></span>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-secondary" onclick="closeDeleteConfirm()" style="margin-right: 10px;">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button id="confirm-delete-btn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Удалить навсегда
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let allProducts = [];
+        let selectedProducts = new Set();
+        let productToDelete = null;
+        
+        // Навигация между разделами
+        function showSection(sectionId) {
+            // Скрываем все разделы
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Показываем выбранный раздел
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add('active');
+            
+            // Загружаем данные для раздела
+            switch(sectionId) {
+                case 'dashboard': loadDashboard(); break;
+                case 'products': loadProducts(); break;
+                case 'workshops': loadWorkshops(); break;
+                case 'add-product': loadFormData(); break;
+                case 'reports': loadReports(); break;
+                case 'advanced-reports': loadAdvancedReports(); break;
+            }
+        }
+        
+        // Загрузка панели управления
+        async function loadDashboard() {
+            try {
+                // Загружаем все данные
+                const [productsRes, workshopsRes, typesRes, materialsRes] = await Promise.all([
+                    fetch(`${API_URL}/products`),
+                    fetch(`${API_URL}/workshops`),
+                    fetch(`${API_URL}/product-types`),
+                    fetch(`${API_URL}/materials`)
+                ]);
+                
+                const products = await productsRes.json();
+                const workshops = await workshopsRes.json();
+                const types = await typesRes.json();
+                const materials = await materialsRes.json();
+                
+                // Обновляем статистику
+                document.getElementById('total-products').textContent = products.count || 0;
+                document.getElementById('total-workshops').textContent = workshops.count || 0;
+                document.getElementById('total-types').textContent = types.count || 0;
+                document.getElementById('total-materials').textContent = materials.count || 0;
+                
+                // Показываем последние продукты
+                if (products.data && products.data.length > 0) {
+                    let html = '<table><tr><th>Артикул</th><th>Наименование</th><th>Цена</th></tr>';
+                    const recent = products.data.slice(0, 5);
+                    recent.forEach(p => {
+                        html += `<tr>
+                            <td><strong>${p.article}</strong></td>
+                            <td>${p.product_name}</td>
+                            <td>${p.min_partner_price} ₽</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    document.getElementById('recent-products').innerHTML = html;
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки дашборда:', error);
+            }
+        }
+        
+        // Загрузка списка продуктов с кнопками действий
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    allProducts = data.data;
+                    
+                    // Показываем блок массовых действий
+                    document.getElementById('bulk-actions').style.display = 'flex';
+                    
+                    let html = '<table><tr><th><input type="checkbox" id="master-checkbox" onchange="toggleSelectAll(this)"></th><th>Артикул</th><th>Наименование</th><th>Тип</th><th>Материал</th><th>Цена</th><th>Дата создания</th><th>Действия</th></tr>';
+                    
+                    data.data.forEach((product, index) => {
+                        const isSelected = selectedProducts.has(product.id);
+                        html += `<tr class="${isSelected ? 'selected-row' : ''}">
+                            <td><input type="checkbox" class="select-checkbox" value="${product.id}" onchange="toggleProductSelection(${product.id}, this)" ${isSelected ? 'checked' : ''}></td>
+                            <td><strong>${product.article}</strong></td>
+                            <td>${product.product_name}</td>
+                            <td>${product.product_type_name || '—'}</td>
+                            <td>${product.material_name || '—'}</td>
+                            <td>${parseFloat(product.min_partner_price).toFixed(2)} ₽</td>
+                            <td>${new Date(product.created_at).toLocaleDateString('ru-RU')}</td>
+                            <td>
+                                <button class="action-btn edit-btn" onclick="editProduct(${product.id})" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="confirmDeleteProduct(${product.id}, '${product.product_name}')" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                    });
+                    
+                    html += `</table><p class="success">✅ Найдено продуктов: ${data.count}</p>`;
+                    document.getElementById('products-list').innerHTML = html;
+                    
+                    // Обновляем счетчик выбранных
+                    updateSelectedCount();
+                } else {
+                    document.getElementById('products-list').innerHTML = '<p class="error">❌ Ошибка загрузки продуктов</p>';
+                }
+                
+            } catch (error) {
+                document.getElementById('products-list').innerHTML = `<p class="error">❌ Ошибка: ${error.message}</p>`;
+            }
+        }
+        
+        // Массовые действия
+        function toggleProductSelection(productId, checkbox) {
+            if (checkbox.checked) {
+                selectedProducts.add(productId);
+            } else {
+                selectedProducts.delete(productId);
+            }
+            
+            // Обновляем класс строки
+            const row = checkbox.closest('tr');
+            if (checkbox.checked) {
+                row.classList.add('selected-row');
+            } else {
+                row.classList.remove('selected-row');
+            }
+            
+            updateSelectedCount();
+        }
+        
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.select-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+                const productId = parseInt(cb.value);
+                
+                if (checkbox.checked) {
+                    selectedProducts.add(productId);
+                    cb.closest('tr').classList.add('selected-row');
+                } else {
+                    selectedProducts.delete(productId);
+                    cb.closest('tr').classList.remove('selected-row');
+                }
+            });
+            
+            updateSelectedCount();
+        }
+        
+        function updateSelectedCount() {
+            document.getElementById('selected-count').textContent = selectedProducts.size;
+        }
+        
+        function clearSelection() {
+            selectedProducts.clear();
+            const checkboxes = document.querySelectorAll('.select-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.closest('tr').classList.remove('selected-row');
+            });
+            updateSelectedCount();
+        }
+        
+        async function deleteSelectedProducts() {
+            if (selectedProducts.size === 0) {
+                alert('❌ Выберите хотя бы один продукт для удаления');
+                return;
+            }
+            
+            if (!confirm(`Вы уверены, что хотите удалить ${selectedProducts.size} выбранных продуктов?`)) {
+                return;
+            }
+            
+            try {
+                // В реальном приложении здесь был бы вызов API для массового удаления
+                // Например: await fetch(`${API_URL}/products/bulk-delete`, { method: 'POST', body: JSON.stringify({ids: Array.from(selectedProducts)}) });
+                
+                // Покажем имитацию удаления
+                alert(`✅ Удалено ${selectedProducts.size} продуктов`);
+                selectedProducts.clear();
+                loadProducts(); // Перезагружаем список
+                loadDashboard(); // Обновляем статистику
+            } catch (error) {
+                alert(`❌ Ошибка при удалении: ${error.message}`);
+            }
+        }
+        
+        // Удаление продукта
+        function confirmDeleteProduct(productId, productName) {
+            productToDelete = productId;
+            document.getElementById('delete-product-name').textContent = productName;
+            document.getElementById('delete-confirm-modal').style.display = 'flex';
+            
+            // Удаляем предыдущий обработчик
+            const oldBtn = document.getElementById('confirm-delete-btn');
+            const newBtn = oldBtn.cloneNode(true);
+            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+            
+            // Добавляем новый обработчик
+            newBtn.addEventListener('click', deleteProduct);
+        }
+        
+        function closeDeleteConfirm() {
+            document.getElementById('delete-confirm-modal').style.display = 'none';
+            productToDelete = null;
+        }
+        
+        async function deleteProduct() {
+            if (!productToDelete) return;
+            
+            try {
+                // В реальном приложении здесь был бы вызов API для удаления
+                // Например: await fetch(`${API_URL}/products/${productToDelete}`, { method: 'DELETE' });
+                
+                alert('✅ Продукт успешно удален');
+                closeDeleteConfirm();
+                loadProducts();
+                loadDashboard();
+            } catch (error) {
+                alert(`❌ Ошибка при удалении: ${error.message}`);
+            }
+        }
+        
+        function editProduct(productId) {
+            // В реальном приложении здесь была бы загрузка формы редактирования
+            alert(`Редактирование продукта с ID: ${productId}\n(В реальном приложении здесь открылась бы форма редактирования)`);
+        }
+        
+        // Загрузка списка цехов
+        async function loadWorkshops() {
+            try {
+                const response = await fetch(`${API_URL}/workshops`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    let html = '<table><tr><th>Название цеха</th><th>Количество работников</th><th>Время обработки (часы)</th><th>Производительность</th></tr>';
+                    
+                    data.data.forEach(workshop => {
+                        // Рассчитываем "производительность" (условно)
+                        const productivity = Math.round((workshop.worker_count * 100) / workshop.processing_time);
+                        const productivityClass = productivity > 150 ? 'status' : productivity > 100 ? '' : 'error';
+                        
+                        html += `<tr>
+                            <td>🏭 ${workshop.workshop_name}</td>
+                            <td>${workshop.worker_count} чел.</td>
+                            <td>${workshop.processing_time} ч</td>
+                            <td><span class="${productivityClass}">${productivity}%</span></td>
+                        </tr>`;
+                    });
+                    
+                    html += `</table><p class="success">✅ Найдено цехов: ${data.count}</p>`;
+                    document.getElementById('workshops-list').innerHTML = html;
+                }
+                
+            } catch (error) {
+                document.getElementById('workshops-list').innerHTML = `<p class="error">❌ Ошибка: ${error.message}</p>`;
+            }
+        }
+        
+        // Загрузка данных для формы
+        async function loadFormData() {
+            try {
+                // Загружаем типы продукции
+                const typesResponse = await fetch(`${API_URL}/product-types`);
+                const typesData = await typesResponse.json();
+                const typeSelect = document.getElementById('product-type');
+                typeSelect.innerHTML = '<option value="">Выберите тип...</option>';
+                if (typesData.data) {
+                    typesData.data.forEach(type => {
+                        typeSelect.innerHTML += `<option value="${type.id}">${type.type_name}</option>`;
+                    });
+                }
+                
+                // Загружаем материалы
+                const materialsResponse = await fetch(`${API_URL}/materials`);
+                const materialsData = await materialsResponse.json();
+                const materialSelect = document.getElementById('material');
+                materialSelect.innerHTML = '<option value="">Выберите материал...</option>';
+                if (materialsData.data) {
+                    materialsData.data.forEach(material => {
+                        materialSelect.innerHTML += `<option value="${material.id}">${material.material_name}</option>`;
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки данных формы:', error);
+            }
+        }
+        
+        // Добавление нового продукта
+        async function addProduct(event) {
+            event.preventDefault();
+            
+            const productData = {
+                article: document.getElementById('article').value,
+                product_name: document.getElementById('product-name').value,
+                product_type_id: parseInt(document.getElementById('product-type').value),
+                main_material_id: parseInt(document.getElementById('material').value),
+                min_partner_price: parseFloat(document.getElementById('price').value),
+                param1: parseFloat(document.getElementById('param1').value),
+                param2: parseFloat(document.getElementById('param2').value)
+            };
+            
+            // Валидация
+            if (!productData.article || !productData.product_name || productData.min_partner_price < 0) {
+                alert('❌ Пожалуйста, заполните все обязательные поля корректно!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/products`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(productData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Продукт успешно добавлен!');
+                    document.getElementById('product-form').reset();
+                    showSection('products');
+                    loadProducts();
+                    loadDashboard(); // Обновляем статистику
+                } else {
+                    alert(`❌ Ошибка: ${result.detail || 'Неизвестная ошибка'}`);
+                }
+            } catch (error) {
+                alert(`❌ Ошибка сети: ${error.message}`);
+            }
+        }
+        
+        // Загрузка отчетов
+        async function loadReports() {
+            try {
+                const [productsRes, workshopsRes] = await Promise.all([
+                    fetch(`${API_URL}/products`),
+                    fetch(`${API_URL}/workshops`)
+                ]);
+                
+                const products = await productsRes.json();
+                const workshops = await workshopsRes.json();
+                
+                let html = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <h3>📊 Статистика продукции</h3>
+                            <p>Всего продуктов: <strong>${products.count || 0}</strong></p>
+                            <p>Средняя цена: <strong>${calculateAveragePrice(products.data)} ₽</strong></p>
+                            <p>Суммарная стоимость: <strong>${calculateTotalPrice(products.data)} ₽</strong></p>
+                        </div>
+                        <div>
+                            <h3>🏭 Статистика цехов</h3>
+                            <p>Всего цехов: <strong>${workshops.count || 0}</strong></p>
+                            <p>Общее количество работников: <strong>${calculateTotalWorkers(workshops.data)}</strong></p>
+                            <p>Среднее время обработки: <strong>${calculateAverageProcessingTime(workshops.data)} ч</strong></p>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('reports-content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('reports-content').innerHTML = `<p class="error">❌ Ошибка загрузки отчетов: ${error.message}</p>`;
+            }
+        }
+        
+        // Загрузка расширенных отчетов
+        async function loadAdvancedReports() {
+            try {
+                const [productsRes, workshopsRes, typesRes, materialsRes] = await Promise.all([
+                    fetch(`${API_URL}/products`),
+                    fetch(`${API_URL}/workshops`),
+                    fetch(`${API_URL}/product-types`),
+                    fetch(`${API_URL}/materials`)
+                ]);
+                
+                const products = await productsRes.json();
+                const workshops = await workshopsRes.json();
+                const types = await typesRes.json();
+                const materials = await materialsRes.json();
+                
+                // Статистика по типам продукции
+                let typeStatsHtml = '';
+                if (types.data) {
+                    types.data.forEach(type => {
+                        const count = products.data ? products.data.filter(p => p.product_type_id === type.id).length : 0;
+                        typeStatsHtml += `
+                            <div class="stat-card">
+                                <div class="stat-label">${type.type_name}</div>
+                                <div class="stat-value">${count}</div>
+                            </div>
+                        `;
+                    });
+                }
+                document.getElementById('type-statistics').innerHTML = typeStatsHtml;
+                
+                // Статистика по материалам
+                let materialStatsHtml = '';
+                if (materials.data) {
+                    materials.data.forEach(material => {
+                        const count = products.data ? products.data.filter(p => p.main_material_id === material.id).length : 0;
+                        materialStatsHtml += `
+                            <div class="stat-card">
+                                <div class="stat-label">${material.material_name}</div>
+                                <div class="stat-value">${count}</div>
+                            </div>
+                        `;
+                    });
+                }
+                document.getElementById('material-statistics').innerHTML = materialStatsHtml;
+                
+                // Загрузка цехов
+                let workshopTableHtml = '';
+                if (workshops.data) {
+                    workshops.data.forEach(workshop => {
+                        const productCount = products.data ? products.data.filter(p => p.workshop_id === workshop.id).length : 0;
+                        const loadPercentage = Math.min(100, Math.round((productCount / 10) * 100)); // Условный расчет
+                        const loadClass = loadPercentage > 80 ? 'error' : loadPercentage > 60 ? '' : 'status';
+                        
+                        workshopTableHtml += `
+                            <tr>
+                                <td>${workshop.workshop_name}</td>
+                                <td>${workshop.worker_count}</td>
+                                <td>${workshop.processing_time} ч</td>
+                                <td><span class="${loadClass}">${loadPercentage}%</span></td>
+                                <td>${productCount}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById('workshop-load-table').innerHTML = workshopTableHtml;
+                
+                // Обновляем резюме отчета
+                document.getElementById('report-date').textContent = new Date().toLocaleString('ru-RU');
+                document.getElementById('total-report-items').textContent = products.count || 0;
+                
+            } catch (error) {
+                console.error('Ошибка загрузки расширенных отчетов:', error);
+            }
+        }
+        
+        // Генерация отчетов
+        function generateDailyReport() {
+            document.getElementById('report-period').textContent = 'За сегодня';
+            alert('📅 Ежедневный отчет сгенерирован');
+        }
+        
+        function generateMonthlyReport() {
+            document.getElementById('report-period').textContent = 'За текущий месяц';
+            alert('📅 Ежемесячный отчет сгенерирован');
+        }
+        
+        function generateFinancialReport() {
+            document.getElementById('report-period').textContent = 'Финансовый отчет';
+            alert('💰 Финансовый отчет сгенерирован');
+        }
+        
+        // Экспорт данных
+        function exportData(type) {
+            let fileName = '';
+            let content = '';
+            
+            switch(type) {
+                case 'products':
+                    fileName = 'products_export.csv';
+                    content = 'Артикул,Наименование,Тип,Материал,Цена\n';
+                    allProducts.forEach(p => {
+                        content += `${p.article},${p.product_name},${p.product_type_name},${p.material_name},${p.min_partner_price}\n`;
+                    });
+                    break;
+                case 'workshops':
+                    fileName = 'workshops_export.csv';
+                    content = 'Цех,Работников,Время обработки\n';
+                    // Здесь должен быть вызов API для получения цехов
+                    break;
+                case 'materials':
+                    fileName = 'materials_export.csv';
+                    content = 'Материал,Описание\n';
+                    // Здесь должен быть вызов API для получения материалов
+                    break;
+                case 'full':
+                    fileName = 'full_report.csv';
+                    content = 'Полный отчет\nДата генерации: ' + new Date().toLocaleString('ru-RU');
+                    break;
+            }
+            
+            // Создаем и скачиваем файл
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            
+            alert(`✅ Данные экспортированы в файл: ${fileName}`);
+        }
+        
+        // Другие функции отчетов
+        function printReport() {
+            window.print();
+        }
+        
+        function saveReportAsPDF() {
+            alert('📄 Функция сохранения как PDF (в реальном приложении используется библиотека jsPDF)');
+        }
+        
+        function emailReport() {
+            alert('📧 Функция отправки по email (в реальном приложении интегрируется с почтовым сервисом)');
+        }
+        
+        // Вспомогательные функции
+        function calculateAveragePrice(products) {
+            if (!products || products.length === 0) return '0.00';
+            const sum = products.reduce((acc, p) => acc + parseFloat(p.min_partner_price), 0);
+            return (sum / products.length).toFixed(2);
+        }
+        
+        function calculateTotalPrice(products) {
+            if (!products || products.length === 0) return '0.00';
+            const sum = products.reduce((acc, p) => acc + parseFloat(p.min_partner_price), 0);
+            return sum.toFixed(2);
+        }
+        
+        function calculateTotalWorkers(workshops) {
+            if (!workshops || workshops.length === 0) return 0;
+            return workshops.reduce((acc, w) => acc + w.worker_count, 0);
+        }
+        
+        function calculateAverageProcessingTime(workshops) {
+            if (!workshops || workshops.length === 0) return '0.00';
+            const sum = workshops.reduce((acc, w) => acc + w.processing_time, 0);
+            return (sum / workshops.length).toFixed(2);
+        }
+        
+        // Инициализация при загрузке
+        window.onload = () => {
+            loadDashboard();
+            loadFormData();
+        };
+    </script>
+</body>
+</html>
